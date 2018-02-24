@@ -1,0 +1,127 @@
+#!/bin/bash
+# chkconfig: 2345 85 15
+# description: nginx is a World Wide Web server. It is used to serve
+
+set -e
+
+
+NGINX_HOME=${WORKHOME}/lnp/nginx
+NGINX_BIN=$NGINX_HOME/sbin/nginx
+PID_FILE=${NGINX_HOME}/logs/nginx.pid
+
+
+cd $NGINX_HOME/sbin
+
+start() {
+    echo -n "Starting nginx: "
+#    if  process_exists $PID $NGINX_BIN; then
+#       echo "Nginx is running aleady!"
+#        return
+#    fi
+    
+    if $NGINX_BIN </dev/null; then
+        echo "ok"
+    else
+        echo "fail"
+    fi
+}
+
+stop() {
+    if [[ ! -f $PID_FILE ]]; then
+        return
+    fi
+    PID=`head $PID_FILE`
+    if ! process_exists $PID $NGINX_BIN; then
+        rm $PID_FILE
+        return
+    fi
+    echo -n "Stopping nginx: "
+    # when nginx.conf error, nginx -s stop will failed
+    #GCONV_PATH=$ODP_GCONV_PATH $NGINX_BIN -s stop
+    kill $PID
+    if wait_for 10 "not process_exists $PID $NGINX_BIN"; then
+        echo 'ok'
+    else
+        echo 'fail'
+        exit 1
+    fi
+}
+status() {
+    if [[ ! -f $PID_FILE ]]; then
+        echo 'Nginx not run.'
+        return
+    fi
+    PID=`head $PID_FILE`
+    if ! process_exists $PID $NGINX_BIN; then
+        rm $PID_FILE
+        echo 'Nginx not run.'
+        return
+    else
+        echo 'Nginx is running...'
+        return
+    fi
+}
+process_exists() {
+    local pid=$1
+    local bin=$2
+    if [[ -d /proc/$pid ]]; then
+        local exe=`readlink -f /proc/$pid/exe`
+        if [[ $exe == $bin ]]; then
+            return 0
+        fi
+        if [[ ! -e $exe ]]; then
+            return 0
+        fi
+    fi
+    return 1
+}
+wait_for() {
+    local try=$1
+    shift
+    for ((;try>0;try--)); do
+        if $2 ; then
+            return 0
+        fi
+        echo -n .
+        sleep 1
+    done
+    return 1
+}
+
+case "$1" in
+        start)
+                stop
+                start
+        ;;
+
+        stop)
+                stop
+        ;;
+
+
+        status)
+                status 
+        ;;
+
+        restart)
+                stop
+                start
+        ;;
+
+        reload)
+                if $NGINX_BIN -s reload; then
+                        echo  "reload ok, please check it youself";
+                else
+                        echo "reload fail"
+                fi
+        ;;
+
+        chkconfig)
+                $NGINX_BIN -t
+        ;;
+
+        *)
+                echo "Usage: $0 {start|stop|restart|chkconfig|reload|status}"
+                exit 1
+        ;;
+esac
