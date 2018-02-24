@@ -32,7 +32,7 @@
 
 docker build -t lnp .
 
-docker run -d --name lnp_app -p 80:8080 -v /home/users/vhost:/home/work/vhost -v /home/users/webroot:/home/work/webroot lee/lnp
+docker run -d --name lnp_app -p 80:8080 -v /home/users/vhost:/home/work/vhost -v /home/users/webroot:/home/work/webroot lnp
 
 curl http://127.0.0.1 (需要在宿主存在/home/users/webroot/html/index.html)
 
