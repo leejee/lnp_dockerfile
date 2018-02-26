@@ -36,8 +36,10 @@ RUN yum install -y gd gd-devel libxml2 libxml2-devel libmcrypt libmcrypt-devel r
 
 
 RUN useradd work
+USER work
 WORKDIR /home/work/
-RUN mkdir -p lnp logs/install_logs logs/nginx logs/php webroot
+RUN mkdir -p lnp logs/install_logs logs/nginx logs/php logs/supervisor webroot
+VOLUME /home/work/logs
 
 WORKDIR /home/work/lnp
 RUN wget ${PHP_SOURCE} -O ${PHP_FILE}.tar.gz && \
@@ -66,14 +68,15 @@ COPY php-fpm.conf /home/work/lnp/php/etc/
 COPY php.ini /home/work/lnp/php/etc/
 RUN ln -s /home/work/vhost /home/work/lnp/nginx/conf/vhost
 
+USER root
 RUN yum install -y python-setuptools
 RUN easy_install supervisor
 COPY supervisord.conf /etc/supervisord.conf
 ENTRYPOINT /usr/bin/supervisord -n -c /etc/supervisord.conf
+RUN yum clean all
 	
 #暴露端口号
 EXPOSE 8080
+USER work
 WORKDIR /home/work
-RUN chmod -R a+x /home/work
 
-RUN yum clean all
