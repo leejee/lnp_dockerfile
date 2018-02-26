@@ -74,10 +74,10 @@ RUN easy_install supervisor
 COPY supervisord.conf /etc/supervisord.conf
 ENTRYPOINT /usr/bin/supervisord -n -c /etc/supervisord.conf
 RUN yum clean all
-RUN rm -rf /home/work/lnp/nginx_http_concat
-RUN rm -f /home/work/lnp/nginx_http_concat.zip
 RUN rm -rf /home/work/lnp/${NGINX_FILE}
 RUN rm -f /home/work/lnp/${NGINX_FILE}.tar.gz
+RUN rm -rf /home/work/lnp/nginx_http_concat
+RUN rm -f /home/work/lnp/nginx_http_concat.zip
 RUN rm -rf /home/work/lnp/${PHP_FILE}
 RUN rm -f /home/work/lnp/${PHP_FILE}.tar.gz
 	
