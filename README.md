@@ -58,6 +58,6 @@ curl http://127.0.0.1 (需要在宿主存在/home/users/webroot/html/index.html)
 docker inspect -f '{{.Volumes}}' CONTAINER
 
 # change log
-	v1.0	init
-	v2.0	修改容器内服务启动用户为普通用户，删除临时文件
-	master	压缩镜像大小，由2.44G压缩至418M。
+    v1.0    init
+    v2.0	修改容器内服务启动用户为普通用户，删除临时文件
+    master	压缩镜像大小，由2.44G压缩至418M。
